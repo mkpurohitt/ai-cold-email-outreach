@@ -9,18 +9,21 @@ const openai = new OpenAI({
     apiKey: process.env.OPENAI_API_KEY,
 });
 
-// Nodemailer Config (Simplified Gmail Service + Debugging)
+// Nodemailer Config (Pooling + Rate Limiting)
 const transporter = nodemailer.createTransport({
     service: 'gmail',
+    pool: true, // Use pooled connections
+    maxConnections: 1, // Limit max connections
+    rateLimit: 1, // Send max 1 email per second (gentle on Gmail)
     auth: {
         user: process.env.EMAIL_USER,
         pass: process.env.EMAIL_PASS
     },
-    logger: true, // Log to console
-    debug: true,  // Include SMTP traffic in logs
-    connectionTimeout: 30000, // 30 seconds
-    greetingTimeout: 30000,
-    socketTimeout: 30000
+    logger: true,
+    debug: true,
+    connectionTimeout: 60000, // 60 seconds
+    greetingTimeout: 60000,
+    socketTimeout: 60000
 });
 
 let isProcessing = false;
