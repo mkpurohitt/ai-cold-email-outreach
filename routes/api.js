@@ -59,7 +59,7 @@ router.post('/upload', upload.single('file'), (req, res) => {
                 res.json({ message: `Successfully processed ${results.length} leads.` });
             } catch (error) {
                 console.error('Database insertion error:', error);
-                res.status(500).json({ error: 'Failed to save leads to database' });
+                res.status(500).json({ error: 'Database error: ' + error.message });
             }
         })
         .on('error', (error) => {
