@@ -1,0 +1,15 @@
+CREATE DATABASE IF NOT EXISTS outreach_db;
+
+USE outreach_db;
+
+CREATE TABLE IF NOT EXISTS leads (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    name VARCHAR(255) NOT NULL,
+    email VARCHAR(255) NOT NULL UNIQUE,
+    company VARCHAR(255),
+    role VARCHAR(255),
+    topic VARCHAR(255),
+    status ENUM('PENDING', 'GENERATED', 'SENT', 'FAILED') DEFAULT 'PENDING',
+    email_body TEXT,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);

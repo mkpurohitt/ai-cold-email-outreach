@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Cold Outreach | Dashboard</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>AI Cold Outreach System</h1>
+            <p>Automate your client outreach with personalized AI emails.</p>
+        </header>
+
+        <div class="dashboard-grid">
+            <!-- Upload Section -->
+            <div class="card upload-card">
+                <h2>Upload Leads</h2>
+                <div id="drop-zone" class="drop-zone">
+                    <span class="icon">📁</span>
+                    <p>Drag & Drop CSV file here or <span>browse</span></p>
+                    <input type="file" id="fileInput" accept=".csv" hidden>
+                </div>
+                <div id="upload-status" class="status-msg"></div>
+            </div>
+
+            <!-- Stats Section -->
+            <div class="card stats-card">
+                <h2>Live Stats</h2>
+                <div class="stats-grid">
+                    <div class="stat-item">
+                        <span class="stat-label">Pending</span>
+                        <span id="stat-pending" class="stat-value">0</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-label">Sent</span>
+                        <span id="stat-sent" class="stat-value text-success">0</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-label">Failed</span>
+                        <span id="stat-failed" class="stat-value text-error">0</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-label">Total Leads</span>
+                        <span id="stat-total" class="stat-value">0</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script src="script.js"></script>
+</body>
+</html>
