@@ -9,9 +9,11 @@ const openai = new OpenAI({
     apiKey: process.env.OPENAI_API_KEY,
 });
 
-// Nodemailer Config
+// Nodemailer Config (Explicit for better tracking and reliability)
 const transporter = nodemailer.createTransport({
-    service: process.env.EMAIL_SERVICE, // e.g. 'gmail'
+    host: 'smtp.gmail.com',
+    port: 465,
+    secure: true, // Use SSL
     auth: {
         user: process.env.EMAIL_USER,
         pass: process.env.EMAIL_PASS
@@ -22,7 +24,6 @@ async function processLeads() {
     console.log('Running background email worker...');
 
     // 1. Fetch 5 oldest PENDING leads
-    let connection;
     try {
         const [leads] = await db.query('SELECT * FROM leads WHERE status = "PENDING" ORDER BY created_at ASC LIMIT 5');
 
@@ -35,11 +36,8 @@ async function processLeads() {
 
         for (const lead of leads) {
             try {
-                // Update status to PROCESSING (or just keep PENDING but we want to avoid re-picking if run overlaps? 
-                // For simplicity in this demo, we process sequentially. We could add a 'PROCESSING' status)
-                // We'll trust the sequential nature here for the demo.
-
                 // 2. Generate Email Content via OpenAI
+                console.log(`[Lead: ${lead.email}] Generating email via OpenAI...`);
                 const prompt = `Write a short, professional cold email to ${lead.name}, who is the ${lead.role} at ${lead.company}. The topic is "${lead.topic}". Keep it under 150 words.`;
 
                 const gptResponse = await openai.chat.completions.create({
@@ -49,6 +47,7 @@ async function processLeads() {
                 });
 
                 const emailBody = gptResponse.choices[0].message.content.trim();
+                console.log(`[Lead: ${lead.email}] OpenAI Success. Sending email via SMTP...`);
 
                 // 3. Send Email via Nodemailer
                 const mailOptions = {
@@ -59,7 +58,7 @@ async function processLeads() {
                 };
 
                 await transporter.sendMail(mailOptions);
-                console.log(`Email sent to ${lead.email}`);
+                console.log(`[Lead: ${lead.email}] Email sent successfully.`);
 
                 // 4. Update Database
                 await db.query('UPDATE leads SET status = "SENT", email_body = ? WHERE id = ?', [emailBody, lead.id]);
