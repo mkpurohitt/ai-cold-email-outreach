@@ -9,18 +9,30 @@ const openai = new OpenAI({
     apiKey: process.env.OPENAI_API_KEY,
 });
 
-// Nodemailer Config (Explicit for better tracking and reliability)
+// Nodemailer Config (Use STARTTLS on 587)
 const transporter = nodemailer.createTransport({
     host: 'smtp.gmail.com',
-    port: 465,
-    secure: true, // Use SSL
+    port: 587,
+    secure: false, // true for 465, false for 587
     auth: {
         user: process.env.EMAIL_USER,
         pass: process.env.EMAIL_PASS
-    }
+    },
+    tls: {
+        rejectUnauthorized: false
+    },
+    connectionTimeout: 10000
 });
 
+let isProcessing = false;
+
 async function processLeads() {
+    if (isProcessing) {
+        console.log('Worker already running. Skipping this cycle.');
+        return;
+    }
+    isProcessing = true;
+
     console.log('Running background email worker...');
 
     // 1. Fetch 5 oldest PENDING leads
@@ -71,6 +83,8 @@ async function processLeads() {
 
     } catch (error) {
         console.error('Error in worker loop:', error);
+    } finally {
+        isProcessing = false;
     }
 }
 
