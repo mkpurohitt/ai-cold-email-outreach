@@ -42,9 +42,14 @@ router.post('/upload', upload.single('file'), (req, res) => {
         .on('end', async () => {
             try {
                 if (results.length > 0) {
-                    const query = 'INSERT IGNORE INTO leads (name, email, company, role, topic, status) VALUES ?';
+                    // Use ON DUPLICATE KEY UPDATE so if we re-upload failed leads, they become PENDING again
+                    const query = `
+                        INSERT INTO leads (name, email, company, role, topic, status) 
+                        VALUES ? 
+                        ON DUPLICATE KEY UPDATE status = 'PENDING'
+                    `;
                     await db.query(query, [results]);
-                    console.log(`Successfully inserted ${results.length} leads.`);
+                    console.log(`Successfully inserted/updated ${results.length} leads.`);
                 } else {
                     console.warn('No leads to insert.');
                 }
