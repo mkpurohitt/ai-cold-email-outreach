@@ -9,19 +9,18 @@ const openai = new OpenAI({
     apiKey: process.env.OPENAI_API_KEY,
 });
 
-// Nodemailer Config (Use STARTTLS on 587)
+// Nodemailer Config (Simplified Gmail Service + Debugging)
 const transporter = nodemailer.createTransport({
-    host: 'smtp.gmail.com',
-    port: 587,
-    secure: false, // true for 465, false for 587
+    service: 'gmail',
     auth: {
         user: process.env.EMAIL_USER,
         pass: process.env.EMAIL_PASS
     },
-    tls: {
-        rejectUnauthorized: false
-    },
-    connectionTimeout: 10000
+    logger: true, // Log to console
+    debug: true,  // Include SMTP traffic in logs
+    connectionTimeout: 30000, // 30 seconds
+    greetingTimeout: 30000,
+    socketTimeout: 30000
 });
 
 let isProcessing = false;
