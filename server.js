@@ -14,6 +14,30 @@ app.use(express.static(path.join(__dirname, 'public')));
 // Routes
 app.use('/api', apiRoutes);
 
+// TEMPORARY: Setup Route for Database (Run once then delete or ignore)
+app.get('/setup-db', async (req, res) => {
+    try {
+        const db = require('./config/database');
+        await db.query(`
+            CREATE TABLE IF NOT EXISTS leads (
+                id INT AUTO_INCREMENT PRIMARY KEY,
+                name VARCHAR(255) NOT NULL,
+                email VARCHAR(255) NOT NULL UNIQUE,
+                company VARCHAR(255),
+                role VARCHAR(255),
+                topic VARCHAR(255),
+                status ENUM('PENDING', 'GENERATED', 'SENT', 'FAILED') DEFAULT 'PENDING',
+                email_body TEXT,
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+            )
+        `);
+        res.send('Database table "leads" created successfully! You can now upload CSVs.');
+    } catch (error) {
+        console.error(error);
+        res.status(500).send('Error creating table: ' + error.message);
+    }
+});
+
 // Error handling middleware
 app.use((err, req, res, next) => {
     console.error(err.stack);
