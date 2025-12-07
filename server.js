@@ -44,6 +44,29 @@ app.use((err, req, res, next) => {
     res.status(500).json({ error: 'Something went wrong!' });
 });
 
-app.listen(PORT, () => {
+const initDb = async () => {
+    try {
+        const db = require('./config/database');
+        await db.query(`
+            CREATE TABLE IF NOT EXISTS leads (
+                id INT AUTO_INCREMENT PRIMARY KEY,
+                name VARCHAR(255) NOT NULL,
+                email VARCHAR(255) NOT NULL UNIQUE,
+                company VARCHAR(255),
+                role VARCHAR(255),
+                topic VARCHAR(255),
+                status ENUM('PENDING', 'GENERATED', 'SENT', 'FAILED') DEFAULT 'PENDING',
+                email_body TEXT,
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+            )
+        `);
+        console.log('Database initialized successfully.');
+    } catch (error) {
+        console.error('Database initialization failed:', error);
+    }
+};
+
+app.listen(PORT, async () => {
+    await initDb();
     console.log(`Server is running on http://localhost:${PORT}`);
 });
